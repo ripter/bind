@@ -74,28 +74,20 @@ describe('jQuery Event Interface', () => {
     test('$elm has on method', () => {
       $elm.on = null;
       expect(() => {
-        bind($elm, 'customEvent', () => {});
+        bind($elm, 'customEvent');
       }).toThrowError('$elm is missing the on method from jQuery API.');
     });
 
     test('$elm has off method', () => {
       $elm.off = null;
       expect(() => {
-        bind($elm, 'customEvent', () => {});
+        bind($elm, 'customEvent');
       }).toThrowError('$elm is missing the off method from jQuery API.');
     });
 
-    test('eventName syntax errors if callback is not defined', () => {
+    test('eventName errors if callback is not a function', () => {
       expect(() => {
         bind($elm, 'customEvent');
-      }).toThrowError('callback must be a function');
-    });
-
-    test('eventObject syntax errors if callback is not defined', () => {
-      expect(() => {
-        bind($elm, {
-          'click': null,
-        });
       }).toThrowError('callback must be a function');
     });
   }); // Guards
