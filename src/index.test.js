@@ -5,15 +5,12 @@ describe('jQuery Event Interface', () => {
   let $elm, callback;
 
   beforeEach(() => {
-    // $elm = $('<div></div>');
     // mock the jquery interface
     $elm = {
       on: jest.fn(),
       off: jest.fn(),
     };
-    // $elm.on = jest.fn($elm.on);
-    // $elm.off = jest.fn($elm.off);
-    // simple spy for testing
+    // mock a callback function
     callback = jest.fn();
   });
 
