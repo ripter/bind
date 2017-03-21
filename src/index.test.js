@@ -9,18 +9,67 @@ describe('jQuery Event Interface', () => {
     $elm = $('<div></div>');
   });
 
-  test('can bind event', () => {
-    return new Promise((resolve, reject) => {
-      // basic single event syntax
-      bind($elm, 'customEvent', () => {
-        // success if called
-        resolve();
+  describe('bind(elm, eventName, callback)', () => {
+    test('can bind event', () => {
+      return new Promise((resolve, reject) => {
+        // basic single event syntax
+        bind($elm, 'customEvent', () => {
+          // success if called
+          resolve();
+        });
+
+        // trigger the event
+        $elm.trigger('customEvent');
+      });
+    });
+  }); // bind($elm, eventName, callback)
+
+  describe('bind($elm, eventObject)', () => {
+    test('works with HTML events', () => {
+      return new Promise((resolve, reject) => {
+        bind($elm, {
+          customEvent: () => {
+            // Reject if it triggered the wrong event
+            reject();
+          },
+          click: () => {
+            // Success if called
+            resolve();
+          },
+        });
+
+        // Trigger native html event
+        $elm.click();
+      });
+    });
+
+    test('works with custom events', () => {
+      return new Promise((resolve, reject) => {
+        bind($elm, {
+          click: () => {
+            // Reject if it triggered the wrong event
+            reject();
+          },
+          customEvent: () => {
+            // Success if called
+            resolve();
+          },
+        });
+        $elm.trigger('customEvent');
+      });
+    });
+
+    test('works with optional selector', () => {
+      const callback = jest.fn();
+      $elm.on = jest.fn($elm.on);
+      bind($elm, {
+        'click .child': callback,
       });
 
-      // trigger the event
-      $elm.trigger('customEvent');
+      expect($elm.on).toHaveBeenCalledWith('click', '.child', callback);
+      // $elm.on.mockClear();
     });
-  });
+  }); // bind($elm, eventObject)
 
   describe('unbind', () => {
     test('returns a function that unbinds the event', () => {
@@ -64,6 +113,20 @@ describe('jQuery Event Interface', () => {
 
         unbind();
         $elm.click();
+      });
+    });
+
+    test('can unbind selectors', () => {
+      return new Promise((resolve, reject) => {
+        const unbind = bind($elm, {
+          customEvent: () => { reject(); },
+          'click .child': () => { reject(); },
+        });
+
+        unbind();
+        $elm.trigger('customEvent');
+        $elm.click();
+        resolve();
       });
     });
   }); // unbind
