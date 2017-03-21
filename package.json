@@ -1,0 +1,29 @@
+{
+  "name": "@ripter/bind",
+  "version": "1.0.0",
+  "description": "bind attaches functions to event systems, and returns a function to unbind/unattach.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "make lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ripter/bind.git"
+  },
+  "keywords": [
+    "util"
+  ],
+  "author": "Chris Richards (https://github.com/ripter)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ripter/bind/issues"
+  },
+  "homepage": "https://github.com/ripter/bind#readme",
+  "devDependencies": {
+    "eslint": "^3.18.0",
+    "eslint-plugin-jest": "^19.0.1",
+    "jest": "^19.0.2",
+    "jquery": "^3.2.1"
+  }
+}
