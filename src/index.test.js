@@ -1,177 +1,106 @@
 const bind = require('./index.js');
-const $ = require('jquery');
 
 // Test that bind works with a jQuery interface
 describe('jQuery Event Interface', () => {
-  let $elm;
+  let $elm, callback;
 
   beforeEach(() => {
-    $elm = $('<div></div>');
+    // $elm = $('<div></div>');
+    // mock the jquery interface
+    $elm = {
+      on: jest.fn(),
+      off: jest.fn(),
+    };
+    // $elm.on = jest.fn($elm.on);
+    // $elm.off = jest.fn($elm.off);
+    // simple spy for testing
+    callback = jest.fn();
   });
 
   describe('bind(elm, eventName, callback)', () => {
-    test('can bind event', () => {
-      return new Promise((resolve, reject) => {
-        // basic single event syntax
-        bind($elm, 'customEvent', () => {
-          // success if called
-          resolve();
-        });
+    test('eventName: "customEvent"', () => {
+      bind($elm, 'customEvent', callback);
+      expect($elm.on).toHaveBeenCalledWith('customEvent', callback);
+    });
 
-        // trigger the event
-        $elm.trigger('customEvent');
-      });
+    test('eventName "click .child"', () => {
+      bind($elm, 'click .child', callback);
+      expect($elm.on).toHaveBeenCalledWith('click', '.child', callback);
+    });
+
+    test('unbind "customEvent"', () => {
+      const unbind = bind($elm, 'customEvent', callback);
+      unbind();
+      expect($elm.off).toHaveBeenCalledWith('customEvent', callback);
+    });
+
+    test('unbind "click #child"', () => {
+      const unbind = bind($elm, 'click #child', callback);
+      unbind();
+      expect($elm.off).toHaveBeenCalledWith('click', '#child', callback);
     });
   }); // bind($elm, eventName, callback)
 
   describe('bind($elm, eventObject)', () => {
-    test('works with HTML events', () => {
-      return new Promise((resolve, reject) => {
-        bind($elm, {
-          customEvent: () => {
-            // Reject if it triggered the wrong event
-            reject();
-          },
-          click: () => {
-            // Success if called
-            resolve();
-          },
-        });
+    let eventObject;
 
-        // Trigger native html event
-        $elm.click();
-      });
+    beforeEach(() => {
+      eventObject = {
+        customEvent: jest.fn(),
+        click: jest.fn(),
+        'custom #selector': jest.fn(),
+      };
     });
 
-    test('works with custom events', () => {
-      return new Promise((resolve, reject) => {
-        bind($elm, {
-          click: () => {
-            // Reject if it triggered the wrong event
-            reject();
-          },
-          customEvent: () => {
-            // Success if called
-            resolve();
-          },
-        });
-        $elm.trigger('customEvent');
-      });
+    test('calls on for each key in eventObject', () => {
+      bind($elm, eventObject);
+      expect($elm.on.mock.calls).toEqual([
+        ['customEvent', eventObject.customEvent],
+        ['click', eventObject.click],
+        ['custom', '#selector', eventObject['custom #selector']],
+      ]);
     });
 
-    test('works with optional selector', () => {
-      const callback = jest.fn();
-      $elm.on = jest.fn($elm.on);
-      bind($elm, {
-        'click .child': callback,
-      });
+    test('unbind removes events', () => {
+      const unbind = bind($elm, eventObject);
+      unbind();
 
-      expect($elm.on).toHaveBeenCalledWith('click', '.child', callback);
-      // $elm.on.mockClear();
+      expect($elm.off.mock.calls).toEqual([
+        ['customEvent', eventObject.customEvent],
+        ['click', eventObject.click],
+        ['custom', '#selector', eventObject['custom #selector']],
+      ]);
     });
   }); // bind($elm, eventObject)
-
-  describe('unbind', () => {
-    test('returns a function that unbinds the event', () => {
-      const unbind = bind($elm, 'customEvent', () => {
-        // fail if called
-        expect(true).toBe('should not trigger after unbind()');
-      });
-
-      unbind();
-      $elm.trigger('customEvent');
-    });
-
-    test('does not unbind other jquery events', () => {
-      return new Promise((resolve, reject) => {
-        const unbind = bind($elm, 'click', () => {
-          // fail if called
-          reject();
-        });
-        // native bind after, so if the unbind fails reject can be called before resolve
-        $elm.on('click', () => {
-          // Should be called
-          resolve();
-        });
-
-        unbind();
-        $elm.click();
-      });
-    });
-
-    test('does not unbind other bind events', () => {
-      return new Promise((resolve, reject) => {
-        const unbind = bind($elm, 'click', () => {
-          // fail if called
-          reject();
-        });
-        // bind after, so if the unbind fails reject can be called before resolve
-        bind($elm, 'click', () => {
-          // Should be called
-          resolve();
-        });
-
-        unbind();
-        $elm.click();
-      });
-    });
-
-    test('can unbind selectors', () => {
-      return new Promise((resolve, reject) => {
-        const unbind = bind($elm, {
-          customEvent: () => { reject(); },
-          'click .child': () => { reject(); },
-        });
-
-        unbind();
-        $elm.trigger('customEvent');
-        $elm.click();
-        resolve();
-      });
-    });
-  }); // unbind
-
 
   describe('Guards', () => {
     test('$elm has on method', () => {
       $elm.on = null;
       expect(() => {
         bind($elm, 'customEvent', () => {});
-      }).toThrowError('$elm is missing the on method from jQuery API.')
+      }).toThrowError('$elm is missing the on method from jQuery API.');
     });
 
     test('$elm has off method', () => {
       $elm.off = null;
       expect(() => {
         bind($elm, 'customEvent', () => {});
-      }).toThrowError('$elm is missing the off method from jQuery API.')
+      }).toThrowError('$elm is missing the off method from jQuery API.');
+    });
+
+    test('eventName syntax errors if callback is not defined', () => {
+      expect(() => {
+        bind($elm, 'customEvent');
+      }).toThrowError('callback must be a function');
+    });
+
+    test('eventObject syntax errors if callback is not defined', () => {
+      expect(() => {
+        bind($elm, {
+          'click': null,
+        });
+      }).toThrowError('callback must be a function');
     });
   }); // Guards
-
-  describe('Sanity Tests', () => {
-    test('jquery native events work', () => {
-      // Returning a promise makes the test async
-      return new Promise((resolve, reject) => {
-        $elm.on('click', () => {
-          // success if called
-          resolve();
-        });
-
-        $elm.click();
-      });
-    });
-
-    test('jquery custom events work', () => {
-      // Returning a promise makes the test async
-      return new Promise((resolve, reject) => {
-        $elm.on('customEvent', () => {
-          // success if called
-          resolve();
-        });
-
-        $elm.trigger('customEvent');
-      });
-    });
-  }); // Sanity Tests
 
 });
