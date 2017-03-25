@@ -1,4 +1,4 @@
-const { bind } = require('./index.js');
+const bind = require('./bind.jQuery.js');
 
 // Test that bind works with a jQuery interface
 describe('jQuery Event Interface', () => {
