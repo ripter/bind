@@ -4,7 +4,7 @@ NODE_BIN=$(shell npm bin)
 all: lint
 
 test: node_modules/
-	$(NODE_BIN)/jest
+	$(NODE_BIN)/jest --verbose
 
 lint: node_modules/
 	$(NODE_BIN)/eslint src/

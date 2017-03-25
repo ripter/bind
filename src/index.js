@@ -1,3 +1,8 @@
 const bindjQuery = require('./bind.jQuery.js');
-module.exports = bindjQuery;
-module.exports.bind = bindjQuery;
+const bindDOM = require('./bind.dom.js');
+
+// Exports
+module.exports = {
+  bindjQuery,
+  bindDOM,
+}
