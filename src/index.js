@@ -5,4 +5,4 @@ const bindDOM = require('./bind.dom.js');
 module.exports = {
   bindjQuery,
   bindDOM,
-}
+};

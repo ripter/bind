@@ -1,5 +1,3 @@
-const NAME = 'bind.dom';
-
 /**
  * bind - listens to event on element, returning a function to stop listening to the event.
  * Inspired by Atom's Disposable
