@@ -31,7 +31,6 @@ elButton.addEventListener('click', () => {
   // OOPS! We don't have a reference to our arrow functions.
   elHover.removeEventListener('mouseover', /*need function reference here */);
   elHover.removeEventListener('mouseout', /*need function reference here */);
-
   // OOPS! Can't unbind this function from the click event!
 });
 ```
@@ -41,6 +40,7 @@ After some reflexion you can solve this issue by assigning the arrow functions t
 
 
 ### Example Fixed: Can use arrow function.
+https://codepen.io/ripter/pen/KmOBBa
 ```
 const unbindMouseover = bind(elHover, 'mouseover', () => {
   elHover.classList.add('is-hovering');
@@ -56,8 +56,6 @@ const unbindClick = bind(elButton, 'click', () => {
   unbindClick();
 });
 ```
-
-
 
 
 ---
@@ -88,7 +86,7 @@ Since events need to be written as pairs, the add and remove, the chunk cost is 
 
 To write a bind function, the developer still needs to know the same three variables plus the bind function. Giving us a chunk cost of four.
 
-To write the pair of event functions, the developer only needs a total of five chunks. The original four to create the event binding, then the returned unbind function. This is still safely in the chunk range. The developer can easily free up more chunks because they do no need to hold on to the three variables after creating the event. 
+To write the pair of event functions, the developer only needs a total of five chunks. The original four to create the event binding, then the returned unbind function. This is still safely in the chunk range. The developer can easily free up more chunks because they do no need to hold on to the three variables after creating the event.
 
 ## Inspiration:
 * [Atom's Disposable](https://github.com/atom/event-kit)
