@@ -3,6 +3,9 @@ NODE_BIN=$(shell npm bin)
 
 all: lint
 
+build: node_modules/
+	$(NODE_BIN)/webpack
+
 test: node_modules/
 	$(NODE_BIN)/jest --verbose
 
