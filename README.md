@@ -1,5 +1,6 @@
-# bind
+# Usage
 The goal is to provide a consistent interface for adding/removing, start/stop, bind/unbind, event listeners.
+Bind is actually several functions, that all follow the same interface. This allows bind to be expanded and handle both `addEventListener` for DOM, and `$.on` for jQuery. You will need to pick the version that matches your event system.
 
 ```
 // Bind/Listen to an event emitted by obj
@@ -7,6 +8,29 @@ const unbind = bind(obj, eventName, callback);
 
 // Unbind/Stop Listening to event created with bind
 unbind();
+```
+
+
+## Install
+### As script tag:
+```
+<script src="bind.dom.js"></script>
+<script>
+  // UMD loads as window.bindEvent instead of window.bind
+  window.bindEvent(elm, 'click', () => {
+    // do something when event is triggered.
+  });
+</script>
+```
+
+### node
+```
+const bind = require('bind.dom.js');
+```
+
+### es6
+```
+import bind from 'bind.dom.js';
 ```
 
 ## Why?
